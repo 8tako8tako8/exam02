@@ -2,137 +2,50 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-int			width = 0;
-int			precision = 0;
-int			is_precision = 0;
-int			neg = 0;
-char		digits[] = "0123456789abcdef";
-int			count = 0;
+int	width = 0;
+int	precision = 0;
+int	is_precision = 0;
+int	minus = 0;
+char	number[] = "0123456789abcdef";
+int	count = 0;
 
-int		count_digit(long num, int base)
+
+int	ft_strlen(char *s)
 {
-	int		i;
+	int	i = 0;
 
-	i = 1;
-	while (num /= base)
+	while (s[i])
 		i++;
-	return (i);
+	return i;
 }
 
-int		ft_strlen(char *str)
+int	ft_atoi(char **fmt)
 {
-	int		len;
+	int	res = 0;
 
-	len = 0;
-	while (str[len])
-		len++;
-	return (len);
-}
-
-int			is_number(char ch)
-{
-	if (ch >= '0' && ch <= '9')
-		return (1);
-	return (0);
-}
-
-int			ft_atoi(char **fmt)
-{
-	int			res;
-
-	res = 0;
-	while (is_number(**fmt))
+	while ('0' <= **fmt && **fmt <= '9')
 	{
-		res = res * 10 + (**fmt - 48);
+		res = res * 10 + (**fmt - '0');
 		(*fmt)++;
 	}
-	return (res);
+	return res;
 }
 
-void		print_int_base(long dx, int base)
+void	print_s(char *s)
 {
-	if (dx < base)
-	{
-		write(1, digits + dx, 1);
-		count++;
-	}
-	else
-	{
-		print_int_base(dx / base, base);
-		print_int_base(dx % base, base);
-	}
-}
-
-void		print_int_fmt(long dx, int base)
-{
-	int		len;
-	int		i;
-
-	if (dx < 0)
-	{
-		neg = 1;
-		dx *= (-1);
-	}
-	len = count_digit(dx, base);
-	i = 0;
-	if (precision > len)
-	{
-		if (width > precision + neg)
-		{
-			while (i++ < width - precision - neg)
-			{
-				write(1, " ", 1);
-				count++;
-			}
-				
-		}
-		if (neg)
-		{
-			write(1, "-", 1);
-			count++;
-		}
-		i = 0;
-		while (i++ < precision - len)
-		{
-			write(1, "0", 1);
-			count++;
-		}
-	}
-	else if (width > len + neg)
-	{
-		while (i++ < width - len - neg)
-		{
-			write(1, " ", 1);
-			count++;
-		}
-		if (neg)
-		{
-			write(1, "-", 1);
-			count++;
-		}
-	}
-	else if (neg)
-	{
-		write(1, "-", 1);
-		count++;
-	}
-	print_int_base(dx, base);
-}
-
-void		print_str(char *s)
-{
-	int			i = 0;
-	int			len;
+	int	i = 0;
+	int	len;
 
 	len = ft_strlen(s);
 	if (is_precision && precision < len)
 		len = precision;
 	if (width > len)
 	{
-		while (i++ < width - len)
+		while (width - len > i)
 		{
 			write(1, " ", 1);
 			count++;
+			i++;
 		}
 	}
 	while (len--)
@@ -142,30 +55,114 @@ void		print_str(char *s)
 	}
 }
 
-void		print_by_fmt(char **fmt, va_list ap)
+int	count_digit(long dx, int base)
 {
-	long			dx;
-	char			*s;
+	int	i = 1;
+
+	while (dx /= base)
+		i++;
+	return i;
+}
+
+
+void	print_dx_num(long dx, int base)
+{
+	if (dx < base)
+	{
+		write(1, number + dx, 1);
+		count++;
+	}
+	else
+	{
+		print_dx_num(dx / base, base);
+		print_dx_num(dx % base, base);
+	}
+}
+
+void	print_dx(long dx, int base)
+{
+	int	digit;
+	int	i = 0;
+
+	if (dx == 0 && is_precision == 1 && precision == 0)
+		return ;
+	if (dx < 0)
+	{
+		minus = 1;
+		dx *= -1;
+	}
+	digit = count_digit(dx, base);
+	if (precision > digit)
+	{
+		if (width > precision + minus)
+		{
+			while (width - precision - minus > i)
+			{
+				write(1, " ", 1);
+				count++;
+				i++;
+			}
+		}
+		if (minus)
+		{
+			write(1, "-", 1);
+			count++;
+		}
+		i = 0;
+		while (precision - digit > i)
+		{
+			write(1, "0", 1);
+			count++;
+			i++;
+		}
+	}
+	else if (width > digit + minus)
+	{
+		i = 0;
+		while (width - digit - minus > i)
+		{
+			write(1, " ", 1);
+			count++;
+			i++;
+		}
+		if (minus)
+		{
+			write(1, "-", 1);
+			count++;
+		}
+	}
+	else if (minus)
+	{
+		write(1, "-", 1);
+		count++;
+	}
+	print_dx_num(dx, base);
+}
+
+void	print_percent(char **fmt, va_list ap)
+{
+	long	dx;
+	char	*s;
 
 	(*fmt)++;
-	if (is_number(**fmt))
+	if ('0' <= **fmt && **fmt <= '9')
 		width = ft_atoi(fmt);
 	if (**fmt == '.')
 	{
-		is_precision = 1;
 		(*fmt)++;
+		is_precision = 1;
 		precision = ft_atoi(fmt);
 	}
 	if (**fmt == 'd')
 	{
 		dx = va_arg(ap, int);
-		print_int_fmt(dx, 10);
+		print_dx(dx, 10);
 		(*fmt)++;
 	}
 	else if (**fmt == 'x')
 	{
 		dx = va_arg(ap, unsigned int);
-		print_int_fmt(dx, 16);
+		print_dx(dx, 16);
 		(*fmt)++;
 	}
 	else if (**fmt == 's')
@@ -173,12 +170,12 @@ void		print_by_fmt(char **fmt, va_list ap)
 		s = va_arg(ap, char *);
 		if (!s)
 			s = "(null)";
-		print_str(s);
+		print_s(s);
 		(*fmt)++;
 	}
 }
 
-void		print_to_percent(char **fmt)
+void	print_not_percent(char **fmt)
 {
 	while (**fmt && **fmt != '%')
 	{
@@ -188,25 +185,24 @@ void		print_to_percent(char **fmt)
 	}
 }
 
-int			ft_printf(const char *fmt, ... )
+int	ft_printf(const char *fmt, ...)
 {
-	va_list			ap;
-
-	va_start(ap, fmt);
+	va_list	ap;
 	count = 0;
+	va_start(ap, fmt);
 	while (*fmt)
 	{
 		width = 0;
 		precision = 0;
 		is_precision = 0;
-		neg = 0;
+		minus = 0;
 		if (*fmt == '%')
-			print_by_fmt((char **)&fmt, ap);
+			print_percent((char **)&fmt, ap);
 		else
-			print_to_percent((char **)&fmt);
+			print_not_percent((char **)&fmt);
 	}
 	va_end(ap);
-	return (count);
+	return count;
 }
 
 #ifdef TEST
