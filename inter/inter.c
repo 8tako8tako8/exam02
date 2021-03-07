@@ -15,10 +15,10 @@ int	ft_strchr(char *s, char c)
 
 void	ft_inter(char *s1, char *s2)
 {
-	int	i,j,k;
-	char	INTER[255];
+	int		i,j,k;
+	char	inter[255] = {};
 
-	INTER[0] = '\0';
+	inter[0] = '\0';
 	i = 0;
 	k = 0;
 	while (s1[i])
@@ -26,17 +26,17 @@ void	ft_inter(char *s1, char *s2)
 		j = 0;
 		while (s2[j])
 		{
-			if (s1[i] == s2[j] && ft_strchr(INTER, s1[i]) == 0)
-				INTER[k++] = s1[i];
+			if (s1[i] == s2[j] && ft_strchr(inter, s1[i]) == 0)
+				inter[k++] = s1[i];
 			j++;
 		}
 		i++;
 	}
-	INTER[k] = '\0';
+	inter[k] = '\0';
 	k = 0;
-	while (INTER[k])
+	while (inter[k])
 	{
-		write(1, &INTER[k], 1);
+		write(1, &inter[k], 1);
 		k++;
 	}
 }

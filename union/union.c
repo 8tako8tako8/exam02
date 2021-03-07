@@ -15,35 +15,35 @@ int	ft_strchr(char *s, char c)
 
 void	ft_union(char *s1, char *s2)
 {
-	int	i,j,k;
-	char	UNION[255];
+	int		i,j,k;
+	char	c[255] = {};
 
 	i = 0;
 	j = 0;
 	k = 0;
-	while (UNION[i])
+	while (c[i])
 	{
-		UNION[i] = '\0';
+		c[i] = '\0';
 		i++;
 	}
 	i = 0;
 	while (s1[i])
 	{
-		if (ft_strchr(UNION, s1[i]) == 0)
-			UNION[k++] = s1[i];
+		if (ft_strchr(c, s1[i]) == 0)
+			c[k++] = s1[i];
 		i++;
 	}
 	while (s2[j])
 	{
-		if (ft_strchr(UNION, s2[j]) == 0)
-			UNION[k++] = s2[j];
+		if (ft_strchr(c, s2[j]) == 0)
+			c[k++] = s2[j];
 		j++;
 	}
-	UNION[k] = '\0';
+	c[k] = '\0';
 	i = 0;
-	while (UNION[i])
+	while (c[i])
 	{
-		write(1, &UNION[i], 1);
+		write(1, &c[i], 1);
 		i++;
 	}
 }
